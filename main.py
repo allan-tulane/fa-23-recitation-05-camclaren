@@ -44,11 +44,14 @@ def make_huffman_tree(f):
 # perform a traversal on the prefix code tree to collect all encodings
 def get_code(node, prefix="", code={}):
     # TODO - perform a tree traversal and collect encodings for leaves in code
+    # if both left & right nodes are empty, then it just updates the prefix with the data at index 1
     if ((node.left == None) and (node.right == None)):
         code[node.data[1]] = prefix
-    elif (node.left != None):
+    # if the left node isn't empty, then it calls the get_code function recursively and adds '0' to the prefix
+    if (node.left != None):
         get_code(node.left, prefix + "0", code)
-    else:
+    # if the right node isn't empty, then it calls the get_code function recursively and adds '1' to the prefix
+    if (node.right != None):
         get_code(node.right, prefix + "1", code)
         
     return code
@@ -56,18 +59,38 @@ def get_code(node, prefix="", code={}):
 # given an alphabet and frequencies, compute the cost of a fixed length encoding
 def fixed_length_cost(f):
     # TODO
-    num_bits = math.ceil(math.log2(len(f.keys())))
-    for x in f.keys():
-        return sum([num_bits * f[x]])
+    # cost of string is length of string * cost of every char (should be the same)
+    # math.ceil(log2(3)) to calculate number of bits needed for every char
+    bits = math.ceil(math.log2(len(f.keys())))
+    total_cost = 0
+    # uses for loop to add all of the calculations together
+    for i in f.keys():
+        total_cost += (bits * f[i])
+    return total_cost
 
 # given a Huffman encoding and character frequencies, compute cost of a Huffman encoding
 def huffman_cost(C, f):
     # TODO
-    for x in f.keys():
-        return sum([len(C[x]) * f[x]])
+    # number of each character * cost for the character
+    # cost of every char is the depth of the char in the tree
+    # every leaf will correspond to every char you're encoding
+    # generate a dict that maps from cost to char by traversing tree and add char whenever you get to a leaf along w the depth of the char in the tree
+    # length of encoding from get_code is the cost
+    # loop to calculate number of bits in each char, then multiply by the frequency
+    total_cost = 0
+    for i in f.keys():
+        total_cost += (len(C[i]) * f[i])
+    return total_cost
 
-f = get_frequencies('f1.txt')
-print("Fixed-length cost:  %d" % fixed_length_cost(f))
-T = make_huffman_tree(f)
-C = get_code(T)
-print("Huffman cost:  %d" % huffman_cost(C, f))
+file_list = ['f1.txt', 'alice29.txt', 'asyoulik.txt', 'grammar.lsp', 'fields.c']
+
+for filename in file_list:
+    f = get_frequencies(filename)
+    print("Fixed-length cost:  %d" % fixed_length_cost(f))
+    
+    T = make_huffman_tree(f)
+    C = get_code(T)
+    print("Huffman cost:  %d" % huffman_cost(C, f))
+    
+    huffman_fixed_ratio = fixed_length_cost(f) / huffman_cost(C, f)
+    print("Huffman vs. fixed-length ratio: %f" % huffman_fixed_ratio)
