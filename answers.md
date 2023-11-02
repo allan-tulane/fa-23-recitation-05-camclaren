@@ -1,7 +1,7 @@
 # CMPS 2200 Recitation 6
 ## Answers
 
-**Name:** Cameron McLaren
+**Name:** Cameron McLaren (lab partner: Kayla Willis)
 
 
 Place all written answers from `recitation-06.md` here for easier grading.
